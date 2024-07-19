@@ -3,17 +3,17 @@ const mongoose = require('mongoose')
 const ProductModel = require("./models/product.model")
 require("dotenv").config()
 
-//initializing app
+    //initializing app
 const app = express();
 
-//env's
+    //env's
 const Port = process.env.PORT
 const ConnectionString = process.env.CONNECTIONSTRING
 
-//middlewares
+    //middlewares
 app.use(express.json());
 
-//database connections
+    //database connections
 mongoose.connect(ConnectionString)
     .then(()=>{
         console.log("DatabaseConnected");
@@ -36,6 +36,20 @@ app.post('/api/products',async (req,res)=>{
 })
 
 
+    //fetching all products 
 app.get('/',(req,res)=>{
-    res.send("Hello.")
+    ProductModel.find({})
+    .then(product => res.json(product))
+    .catch ((error)=> console.log(error))
+})
+
+    //getting a product  by id
+app.get('/api/product/:id', async(req,res)=>{
+    try {
+        const {id} = req.params
+        const product = await ProductModel.findById(id)
+        res.status(200).json(product)
+    } catch (error) {
+        res.status(500).json(error)
+    }
 })
